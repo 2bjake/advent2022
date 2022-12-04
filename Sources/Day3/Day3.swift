@@ -14,12 +14,11 @@ func priority(of char: Character) -> Int {
 
 public func partOne() {
   let result = input.split(separator: "\n").map {
-    let front = Set($0.prefix($0.count / 2))
-    let back = Set($0.suffix($0.count / 2))
-    let char = front.intersection(back).only!
+    let halves = $0.halved()!
+    let char = Set(halves.front).intersection(halves.back).only!
     return priority(of: char)
   }.reduce(0, +)
-  print(result)
+  print(result) // 7878
 }
 
 func priorityOfGroup(_ group: any Collection<[Character]>) -> Int {
