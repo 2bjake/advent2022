@@ -19,10 +19,10 @@ func ranges() -> [(ClosedRange<Int>, ClosedRange<Int>)] {
 //// parsing with RegexBuilder ////
 
 func regexRanges() -> [(ClosedRange<Int>, ClosedRange<Int>)] {
-  let int = Capture {
+  let int = TryCapture {
     OneOrMore(.digit)
   } transform: {
-    Int($0)!
+    Int($0)
   }
 
   let rangeRegex = Regex {

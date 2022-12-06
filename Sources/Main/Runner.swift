@@ -1,4 +1,4 @@
-import Day4
+import Day6
 import AdventUtilities
 
 @main
