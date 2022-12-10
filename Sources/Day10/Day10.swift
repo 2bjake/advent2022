@@ -3,73 +3,52 @@ import RegexBuilder
 import Foundation
 import AdventUtilities
 
-enum Instruction {
-  case noop
-  case addx(Int)
-}
-
 let intCapture = TryCapture { .localizedInteger(locale: .current) } transform: { Int($0) }
 
-func parseInstructions() -> [Instruction] {
+func parse() -> [Int] {
   input.split(separator: "\n").flatMap {
-    if $0 == "noop" {
-      return [Instruction.noop]
-    } else if let (_, value) = $0.firstMatch(of: intCapture)?.output {
-      return [.noop, .addx(value)]
-    } else {
-      fatalError()
+    var result = [0]
+    if let (_, value) = $0.firstMatch(of: intCapture)?.output {
+      result += [value]
     }
+    return result
   }
 }
-
-
 
 public func partOne() {
   let cycles: Set = [20, 60, 100, 140, 180, 220]
 
   var result = 0
-  var value = 1
-  var cycle = 1
-  for instruction in parseInstructions() {
-    if cycle.isIn(cycles) {
-      result += cycle * value
+  var registerValue = 1
+  var cycleNum = 1
+  for addValue in parse() {
+    if cycleNum.isIn(cycles) {
+      result += cycleNum * registerValue
     }
-    if case let .addx(addValue) = instruction {
-      value += addValue
-    }
-    cycle += 1
+    registerValue += addValue
+    cycleNum += 1
   }
 
-  print(result)
+  print(result) // 14620
 }
 
-struct Sprite {
-  var centerPosition: Int
-
-  func contains(_ x: Int) -> Bool {
-    x == centerPosition - 1 || x == centerPosition || x == centerPosition + 1
-  }
-}
-
-func drawLine(instructions: [Instruction], sprite: inout Sprite) -> String {
+func drawLine(addValues: [Int], spritePos: inout Int) -> String {
   var result = ""
   var pixelNum = 0
-  for instruction in instructions {
-    result += sprite.contains(pixelNum) ? "#" : " "
-    if case let .addx(value) = instruction {
-      sprite.centerPosition += value
-    }
+  for value in addValues {
+    result += absDiff(spritePos, pixelNum) <= 1 ? "🟩" : "⬛️"
+    spritePos += value
     pixelNum += 1
   }
   return result
 }
 
 public func partTwo() {
-  var sprite = Sprite(centerPosition: 1)
+  var spritePos = 1
 
   var lines = [String]()
-  for lineInstructions in parseInstructions().chunks(ofCount: 40) {
-    lines.append(drawLine(instructions: Array(lineInstructions), sprite: &sprite))
+  for values in parse().chunks(ofCount: 40) {
+    lines.append(drawLine(addValues: Array(values), spritePos: &spritePos))
   }
-  print(lines.joined(separator: "\n"))
+  print(lines.joined(separator: "\n")) // BJFRHRFU
 }
